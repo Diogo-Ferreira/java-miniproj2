@@ -9,10 +9,10 @@ public class StatusState implements IState {
     @Override
     public void handleState(StationConnection context) throws IOException {
         boolean stop = false;
-        context.getPw().println("SENDSTATUS");
-        context.getPw().flush();
+        context.getWriter().println("SENDSTATUS");
+        context.getWriter().flush();
         while(!stop){
-            String line = context.getIn().readLine();
+            String line = context.getReader().readLine();
             if(line.equals("ENDSTATUS")){
                 stop = true;
             }else {

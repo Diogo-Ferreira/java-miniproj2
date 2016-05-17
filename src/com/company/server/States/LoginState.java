@@ -1,9 +1,7 @@
 package com.company.server.States;
 import com.company.server.StationConnection;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * Created by diogo on 29.04.16.
@@ -11,7 +9,7 @@ import java.io.PrintWriter;
 public class LoginState implements IState {
     @Override
     public void handleState(StationConnection context) throws IOException {
-        String line = context.getIn().readLine();
+        String line = context.getReader().readLine();
         if(line != null){
             String[] args = line.split(" ");
             if(args.length == 3 && context.getDataBase().checkLogin(args[1],args[2])){
@@ -25,6 +23,5 @@ public class LoginState implements IState {
         }else{
             context.kill();
         }
-
     }
 }

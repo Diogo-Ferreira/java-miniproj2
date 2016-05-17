@@ -28,6 +28,11 @@ public class Server {
         }
     }
 
+    /**
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void listen() throws IOException, InterruptedException {
         //Overrides CTRL + C
         Runtime.getRuntime().addShutdownHook(new Thread(){
@@ -54,6 +59,11 @@ public class Server {
             }
         }
     }
+
+    /**
+     *
+     * @param sc
+     */
     synchronized public void onConnectionEnded(StationConnection sc){
         connections.remove(sc);
         System.out.println(sc + " removed");

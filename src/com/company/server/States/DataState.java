@@ -2,13 +2,7 @@ package com.company.server.States;
 
 import com.company.server.StationConnection;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by diogo on 29.04.16.
@@ -17,10 +11,10 @@ public class DataState implements IState {
     @Override
     public void handleState(StationConnection context) throws IOException {
         boolean stop = false;
-        context.getPw().println("SENDDATA");
-        context.getPw().flush();
+        context.getWriter().println("SENDDATA");
+        context.getWriter().flush();
         while(!stop){
-            String line = context.getIn().readLine();
+            String line = context.getReader().readLine();
             if(line.equals("ENDDATA")){
                 stop = true;
             }else {

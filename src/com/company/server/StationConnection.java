@@ -1,7 +1,6 @@
 package com.company.server;
 
 import com.company.database.InsertDataBase;
-import com.company.database.SelectDataBase;
 import com.company.server.States.*;
 
 import java.io.*;
@@ -18,23 +17,23 @@ public class StationConnection extends Thread {
     private boolean stop = false;
     private boolean logged = false;
     private IState currentState = new IdleState();
-    private PrintWriter pw = null;
-    private BufferedReader in = null;
+    private PrintWriter writer = null;
+    private BufferedReader reader = null;
     private InsertDataBase dataBase;
 
     public StationConnection(Socket connection,Server server) {
         this.connection = connection;
         this.server = server;
-        dataBase = new InsertDataBase("jdbc:mysql://localhost/meteo_radar");
+        dataBase = new InsertDataBase();
     }
 
     @Override
     public void run() {
         try {
-            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            pw = new PrintWriter(connection.getOutputStream());
-            pw.println("HELLO");
-            pw.flush();
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            writer = new PrintWriter(connection.getOutputStream());
+            writer.println("HELLO");
+            writer.flush();
             while(!stop){
                 currentState.handleState(this);
             }
@@ -42,8 +41,8 @@ public class StationConnection extends Thread {
             e.printStackTrace();
         } finally {
             try {
-                in.close();
-                pw.close();
+                reader.close();
+                writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -52,7 +51,9 @@ public class StationConnection extends Thread {
         server.onConnectionEnded(this);
     }
 
-
+    /**
+     *
+     */
     public void kill(){
         System.out.println("good bye");
         stop = true;
@@ -80,12 +81,12 @@ public class StationConnection extends Thread {
         this.stationName = stationName;
     }
 
-    public PrintWriter getPw() {
-        return pw;
+    public PrintWriter getWriter() {
+        return writer;
     }
 
-    public BufferedReader getIn() {
-        return in;
+    public BufferedReader getReader() {
+        return reader;
     }
 
     public InsertDataBase getDataBase() {

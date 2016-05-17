@@ -11,5 +11,10 @@ import java.net.Socket;
  * Created by diogo on 29.04.16.
  */
 public interface IState {
+    /**
+     *
+     * @param context
+     * @throws IOException
+     */
     void handleState(StationConnection context) throws IOException;
 }

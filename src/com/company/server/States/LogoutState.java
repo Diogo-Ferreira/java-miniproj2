@@ -10,8 +10,8 @@ import java.io.IOException;
 public class LogoutState implements IState {
     @Override
     public void handleState(StationConnection context) throws IOException {
-        context.getPw().println("LOGOUT");
-        context.getPw().flush();
+        context.getWriter().println("LOGOUT");
+        context.getWriter().flush();
         context.kill();
     }
 }

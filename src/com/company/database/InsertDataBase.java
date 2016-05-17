@@ -1,7 +1,10 @@
 package com.company.database;
+import sun.util.calendar.BaseCalendar;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by diogo on 29.04.16.
@@ -10,9 +13,6 @@ public class InsertDataBase extends DataBaseManager {
 
     private int stationId;
 
-    public InsertDataBase(String DB_URL) {
-        super(DB_URL);
-    }
 
     public boolean checkLogin(String name,String pass){
         try {
