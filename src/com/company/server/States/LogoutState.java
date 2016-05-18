@@ -5,13 +5,16 @@ import com.company.server.StationConnection;
 import java.io.IOException;
 
 /**
- * Created by diogo on 29.04.16.
+ * Implémentation de l'état logout
  */
 public class LogoutState implements IState {
     @Override
     public void handleState(StationConnection context) throws IOException {
-        context.getWriter().println("LOGOUT");
-        context.getWriter().flush();
-        context.kill();
+        if (context.isLogged()) {
+            context.setLogged(false);
+            context.getWriter().println("LOGOUT");
+            context.getWriter().flush();
+            context.kill();
+        }
     }
 }

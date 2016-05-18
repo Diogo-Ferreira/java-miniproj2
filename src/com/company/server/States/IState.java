@@ -12,8 +12,8 @@ import java.net.Socket;
  */
 public interface IState {
     /**
-     *
-     * @param context
+     * Chaque état (LOGIN,DATA,STATUS,LOGOUT..) Devra être implémenté
+     * @param context connectionClient
      * @throws IOException
      */
     void handleState(StationConnection context) throws IOException;

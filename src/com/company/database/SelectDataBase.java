@@ -10,12 +10,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by diogo on 29.04.16.
+ * Classe pour la gestion des fetch des données météo
  */
 public class SelectDataBase extends DataBaseManager {
 
     private HashMap<String,String> status = new HashMap<>();
     private HashMap<Pair<Integer,Integer>,Double> data = new HashMap<>();
+
+
+    /**
+     * Fetch toutes les stations présentes dans la BDD
+     * @return tableau de strings avec les noms
+     */
     public String[] getAvaibleStations(){
         String query = "SELECT name FROM stations";
         try {
@@ -31,6 +37,11 @@ public class SelectDataBase extends DataBaseManager {
         }
         return null;
     }
+
+    /**
+     * Fetch les status d'une station particulière
+     * @param name nom de la station
+     */
     public void getStatusFromStation(String name){
         String query = "SELECT status.key,status.value FROM stations JOIN status ON status.stationId = stations.id WHERE stations.name=?";
         try {
@@ -45,7 +56,13 @@ public class SelectDataBase extends DataBaseManager {
             e.printStackTrace();
         }
     }
-    public void getDataFromStation(String qty,String name,int nbDays){
+
+    /**
+     * Fetch les données d'une station
+     * @param qty le type de mesure souhaité
+     * @param name nom de la station
+     */
+    public void getDataFromStation(String qty,String name){
         String query = "SELECT data.value,HOUR(data.timestamp) as hour,DATEDIFF(NOW(),data.timestamp) as day FROM" +
                 " data JOIN stations on data.stationId=stations.id WHERE qty=? AND stations.name=?";
         try {
@@ -61,6 +78,11 @@ public class SelectDataBase extends DataBaseManager {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Fetch des différents types de mesures présents dans la bdd
+     * @return tableau de strings
+     */
     public String[] getAvaibleQuantities(){
         String query = "SELECT DISTINCT qty FROM data";
         try {
@@ -76,6 +98,7 @@ public class SelectDataBase extends DataBaseManager {
         }
         return null;
     }
+
     public HashMap<String, String> getStatus() {
         return status;
     }

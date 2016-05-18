@@ -6,12 +6,19 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * Created by diogo on 29.04.16.
+ * Serveur de connexions
  */
 public class Server {
 
     private int port;
+    /**
+     * Nombre de connexions max simultanées
+     */
     private int maxConnectionsAllowed;
+    /**
+     * Le tableaux de connection permet d'avoir
+     * un accès sur toutes les connexions actuelles
+     */
     private ArrayList<StationConnection> connections;
     private boolean stop = false;
 
@@ -29,12 +36,13 @@ public class Server {
     }
 
     /**
-     *
+     * Ecoute réseau
      * @throws IOException
      * @throws InterruptedException
      */
     private void listen() throws IOException, InterruptedException {
-        //Overrides CTRL + C
+
+        //En cas de CTRL + C, on arrête toutes les connexions
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run() {
@@ -50,6 +58,7 @@ public class Server {
         ServerSocket serverSocket = new ServerSocket(port);
 
         while(!stop){
+            //Si on peut encore accepter des machines
             if(connections.size() < maxConnectionsAllowed){
                 Socket instance = serverSocket.accept();
                 StationConnection sc = new StationConnection(instance,this);
@@ -61,13 +70,17 @@ public class Server {
     }
 
     /**
-     *
+     * Callback lorsque la connexion se termine
      * @param sc
      */
     synchronized public void onConnectionEnded(StationConnection sc){
         connections.remove(sc);
         System.out.println(sc + " removed");
     }
+
+    /**
+     * Arrête la boucle principale du serveur
+     */
     private void stopServer(){
         stop = true;
     }

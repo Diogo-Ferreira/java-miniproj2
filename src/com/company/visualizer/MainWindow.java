@@ -26,7 +26,7 @@ import java.text.DecimalFormat;
 import java.util.Map;
 
 /**
- * Created by diogo on 03.05.16.
+ * Fenêtre principale visualiseur
  */
 public class MainWindow extends Application {
     private NumberAxis xAxis = new NumberAxis("Nombre de jours passé depuis aujord'hui",0,30,1);
@@ -40,10 +40,18 @@ public class MainWindow extends Application {
     private ChoiceBox choiceQuantity;
     private String currentStation;
 
+    /**
+     * Gestion onclick button connection
+     */
     private EventHandler<ActionEvent> onConnection = event -> {
         if(dataBase != null && !choiceStation.getSelectionModel().isEmpty()){
+
+            //Station actuel
             currentStation = choiceStation.getSelectionModel().getSelectedItem().toString();
+
+            //Fetch status
             dataBase.getStatusFromStation(currentStation);
+
             if(statusPane != null){
                 statusPane.setStatus(dataBase.getStatus());
             }
@@ -51,21 +59,36 @@ public class MainWindow extends Application {
                 statusPane.getStatus().put("No statuses to show","");
                 statusPane.refreshStatus();
             }
+
+            //On réactive le choice pour afficher les quantitées
             choiceQuantity.setDisable(false);
             chart.getData().clear();
         }
     };
 
+    /**
+     * Gestion onclick button showgraph
+     */
     private EventHandler<ActionEvent> onShowGraph = event -> {
         if(!choiceQuantity.getSelectionModel().isEmpty()){
+
+            //Quantité à afficher
             String currentQty = choiceQuantity.getSelectionModel().getSelectedItem().toString();
-            dataBase.getDataFromStation(currentQty,currentStation,(int)xAxis.getUpperBound());
+
+            //Fetch des données dans la BDD
+            dataBase.getDataFromStation(currentQty,currentStation);
+
             //Si la qty est déjà présente dans les séries ont l'enlève
             chart.setData(FXCollections.observableArrayList(chart.getData().filtered(numberNumberSeries -> !numberNumberSeries.getName().equals(currentQty))));
+
+            //Remplissage des données dans le chart
             XYChart.Series<Number,Number> series = new XYChart.Series<>();
             for(Map.Entry<Pair<Integer,Integer>,Double> e : dataBase.getData().entrySet()){
+                //Jour
                 Double day = new Double(e.getKey().getKey());
+                //Heure
                 Double hour = new Double((double)e.getKey().getValue() / 24.0);
+                //La valeur moyenne est affiché
                 series.getData().add(new XYChart.Data<>( hour + day,e.getValue()));
             }
             series.setName(currentQty);
@@ -88,14 +111,20 @@ public class MainWindow extends Application {
         primaryStage.show();
         primaryStage.sizeToScene();
         primaryStage.setResizable(false);
+        yAxis.setForceZeroInRange(false);
     }
 
+    /**
+     * Construction de l'interface
+     */
     private void buildUi(){
         VBox mainLayout = new VBox();
         mainLayout.setPadding(new Insets(5,5,5,5));
         mainLayout.setSpacing(10);
         root.getChildren().add(mainLayout);
         mainLayout.setAlignment(Pos.CENTER);
+
+
         //Ajout selection stations
         HBox stationsChoixHLayout = new HBox();
         stationsChoixHLayout.setSpacing(10);
@@ -108,6 +137,8 @@ public class MainWindow extends Application {
         stationsChoixHLayout.setAlignment(Pos.CENTER_LEFT);
         mainLayout.getChildren().add(stationsChoixHLayout);
         //FIN selection stations
+
+
         //Status Pane
         mainLayout.getChildren().add(statusPane);
         //Chart
@@ -124,6 +155,8 @@ public class MainWindow extends Application {
         clearAllData.setOnAction(event -> {
             chart.getData().clear();
         });
+
+
         TextField daysToShow = new TextField("30");
         TextField startDay = new TextField("0");
         daysToShow.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -146,6 +179,7 @@ public class MainWindow extends Application {
                 xAxis.setLowerBound(Integer.parseInt(startDay.getText()));
             }
         });
+
         showGraph.setOnAction(onShowGraph);
         qtyChoixHLayout.getChildren().addAll(showGraph,clearAllData,new Label("jour départ"),startDay,new Label("jour fin"),daysToShow);
         qtyChoixHLayout.setAlignment(Pos.CENTER_LEFT);

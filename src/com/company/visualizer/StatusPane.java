@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by diogo on 03.05.16.
+ * Scrollpane pour l'affichage des status
  */
 public class StatusPane extends ScrollPane {
     private HashMap<String,String> status = new HashMap<>();
@@ -28,6 +28,9 @@ public class StatusPane extends ScrollPane {
         setStyle("-fx-background: white;-fx-border-color: white;");
         mainLayout.setStyle("-fx-background-color: white");
     }
+    /**
+     * Rafraichit l'affichage des status (pas les données !)
+     */
     public void refreshStatus(){
         mainLayout.getChildren().clear();
         for(Map.Entry<String, String> entry : status.entrySet()){
@@ -41,7 +44,6 @@ public class StatusPane extends ScrollPane {
             lbl.setMinWidth(100);
             mainLayout.getChildren().add(subLayout);
         }
-
         if(status.isEmpty()){
             mainLayout.getChildren().add(new Label("No Status, please connect"));
         }

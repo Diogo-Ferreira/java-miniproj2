@@ -7,7 +7,8 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * Created by diogo on 29.04.16.
+ * Gère une connexion à la station,
+ * les différents état LOGIN,DATA... sont implémenter avec le pattern STATE
  */
 public class StationConnection extends Thread {
 
@@ -32,8 +33,10 @@ public class StationConnection extends Thread {
         try {
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             writer = new PrintWriter(connection.getOutputStream());
+            //Message de départ
             writer.println("HELLO");
             writer.flush();
+            //On gère l'état actuel
             while(!stop){
                 currentState.handleState(this);
             }
@@ -47,12 +50,12 @@ public class StationConnection extends Thread {
                 e.printStackTrace();
             }
         }
-        //Signals the server that we're dead, so that it cans update connections list
+        //On signale le serveur qu'on as finit, comme ça il peut mettre à jour sa liste
         server.onConnectionEnded(this);
     }
 
     /**
-     *
+     * Termine la connexion
      */
     public void kill(){
         System.out.println("good bye");
