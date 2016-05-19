@@ -22,7 +22,7 @@ public class LoginState implements IState {
                 context.setCurrentState(new DataState());
             }else{
                 System.out.println("INCORRECT LOGIN FOR " + args[1]);
-                //On pourrait aussi penser à fermer le connexion ici
+                //On pourrait aussi penser à fermer le connexion ici avec kill ! mais on va être gentil :)
             }
         }else{
             context.kill();

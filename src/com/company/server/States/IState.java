@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
- * Created by diogo on 29.04.16.
+ * Interface de base pour l'implémentation du patron STATE
  */
 public interface IState {
     /**

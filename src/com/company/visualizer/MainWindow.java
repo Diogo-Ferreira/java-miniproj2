@@ -12,14 +12,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.chart.AreaChart;
 import javafx.util.Pair;
 
 import java.text.DecimalFormat;
@@ -29,9 +26,9 @@ import java.util.Map;
  * Fenêtre principale visualiseur
  */
 public class MainWindow extends Application {
-    private NumberAxis xAxis = new NumberAxis("Nombre de jours passé depuis aujord'hui",0,30,1);
+    private CategoryAxis xAxis = new CategoryAxis();
     private NumberAxis yAxis = new NumberAxis();
-    private LineChart<Number,Number> chart = new LineChart<Number, Number>(xAxis,yAxis);
+    private LineChart<String,Number> chart = new LineChart<String, Number>(xAxis,yAxis);
     private StatusPane statusPane = new StatusPane();
     private Group root;
     private Scene scene;
@@ -72,6 +69,9 @@ public class MainWindow extends Application {
     private EventHandler<ActionEvent> onShowGraph = event -> {
         if(!choiceQuantity.getSelectionModel().isEmpty()){
 
+            //On supprime les données présentes
+            chart.getData().clear();
+
             //Quantité à afficher
             String currentQty = choiceQuantity.getSelectionModel().getSelectedItem().toString();
 
@@ -82,18 +82,24 @@ public class MainWindow extends Application {
             chart.setData(FXCollections.observableArrayList(chart.getData().filtered(numberNumberSeries -> !numberNumberSeries.getName().equals(currentQty))));
 
             //Remplissage des données dans le chart
-            XYChart.Series<Number,Number> series = new XYChart.Series<>();
-            for(Map.Entry<Pair<Integer,Integer>,Double> e : dataBase.getData().entrySet()){
-                //Jour
-                Double day = new Double(e.getKey().getKey());
-                //Heure
-                Double hour = new Double((double)e.getKey().getValue() / 24.0);
-                //La valeur moyenne est affiché
-                series.getData().add(new XYChart.Data<>( hour + day,e.getValue()));
+            XYChart.Series<String,Number> seriesMin = new XYChart.Series<>();
+            XYChart.Series<String,Number> seriesVal = new XYChart.Series<>();
+            XYChart.Series<String,Number> seriesMax = new XYChart.Series<>();
+
+            for(Map.Entry<String,double[]> e : dataBase.getData().entrySet()){
+                //MIN
+                seriesMin.getData().add(new XYChart.Data<>(e.getKey(),e.getValue()[0]));
+
+                //Val
+                seriesVal.getData().add(new XYChart.Data<>(e.getKey(),e.getValue()[1]));
+
+                //MAX
+                seriesMax.getData().add(new XYChart.Data<>(e.getKey(),e.getValue()[2]));
             }
-            series.setName(currentQty);
-            chart.getData().add(series);
-            System.out.println(dataBase.getData());
+            seriesMin.setName(currentQty+ " (MIN) ");
+            seriesVal.setName(currentQty);
+            seriesMax.setName(currentQty + " (MAX) ");
+            chart.getData().addAll(seriesMin,seriesVal,seriesMax);
         }
     };
 
@@ -112,6 +118,7 @@ public class MainWindow extends Application {
         primaryStage.sizeToScene();
         primaryStage.setResizable(false);
         yAxis.setForceZeroInRange(false);
+        chart.setAnimated(false);
     }
 
     /**
@@ -120,70 +127,54 @@ public class MainWindow extends Application {
     private void buildUi(){
         VBox mainLayout = new VBox();
         mainLayout.setPadding(new Insets(5,5,5,5));
+
         mainLayout.setSpacing(10);
         root.getChildren().add(mainLayout);
-        mainLayout.setAlignment(Pos.CENTER);
-
 
         //Ajout selection stations
         HBox stationsChoixHLayout = new HBox();
         stationsChoixHLayout.setSpacing(10);
+
         stationsChoixHLayout.getChildren().add(new Label("Station :"));
         choiceStation = new ChoiceBox(FXCollections.observableArrayList(dataBase.getAvaibleStations()));
+
         stationsChoixHLayout.getChildren().add(choiceStation);
         Button connection = new Button("Connection");
+
         connection.setOnAction(onConnection);
         stationsChoixHLayout.getChildren().add(connection);
-        stationsChoixHLayout.setAlignment(Pos.CENTER_LEFT);
+
         mainLayout.getChildren().add(stationsChoixHLayout);
+        stationsChoixHLayout.setStyle("-fx-alignment: center");
         //FIN selection stations
 
 
         //Status Pane
         mainLayout.getChildren().add(statusPane);
+
+
         //Chart
         mainLayout.getChildren().add(chart);
+        chart.setStyle("-fx-alignment: center");
+
+
         //Ajout selection quantity
         HBox qtyChoixHLayout = new HBox();
+
         qtyChoixHLayout.setSpacing(10);
         qtyChoixHLayout.getChildren().add(new Label("Quantity :"));
+
         choiceQuantity = new ChoiceBox(FXCollections.observableArrayList(dataBase.getAvaibleQuantities()));
         choiceQuantity.setDisable(true);
+
         qtyChoixHLayout.getChildren().add(choiceQuantity);
         Button showGraph = new Button("Show graph");
-        Button clearAllData = new Button("Effacer tout");
-        clearAllData.setOnAction(event -> {
-            chart.getData().clear();
-        });
-
-
-        TextField daysToShow = new TextField("30");
-        TextField startDay = new TextField("0");
-        daysToShow.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.matches("\\d*")){
-                daysToShow.setText(oldValue);
-            }else if(!newValue.isEmpty() && Integer.parseInt(newValue) > 100){
-                daysToShow.setText(oldValue);
-            }
-            if(!daysToShow.getText().isEmpty()){
-                xAxis.setUpperBound(Integer.parseInt(daysToShow.getText()));
-            }
-        });
-        startDay.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.matches("\\d*")){
-                startDay.setText(oldValue);
-            }else if(!newValue.isEmpty() && (Integer.parseInt(newValue) > 100 || Integer.parseInt(newValue) > Integer.parseInt(daysToShow.getText()))){
-                startDay.setText(oldValue);
-            }
-            if(!startDay.getText().isEmpty()){
-                xAxis.setLowerBound(Integer.parseInt(startDay.getText()));
-            }
-        });
 
         showGraph.setOnAction(onShowGraph);
-        qtyChoixHLayout.getChildren().addAll(showGraph,clearAllData,new Label("jour départ"),startDay,new Label("jour fin"),daysToShow);
-        qtyChoixHLayout.setAlignment(Pos.CENTER_LEFT);
+        qtyChoixHLayout.getChildren().addAll(showGraph);
+
         mainLayout.getChildren().add(qtyChoixHLayout);
-        //FIN selection stations
+        qtyChoixHLayout.setStyle("-fx-alignment: center");
+        //FIN selection quantity
     }
 }

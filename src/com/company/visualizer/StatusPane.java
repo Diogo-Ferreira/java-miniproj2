@@ -23,7 +23,6 @@ public class StatusPane extends ScrollPane {
     public StatusPane() {
         refreshStatus();
         setContent(mainLayout);
-        //mainLayout.setPadding(new Insets(5,5,5,5));
         setPrefHeight(100);
         setStyle("-fx-background: white;-fx-border-color: white;");
         mainLayout.setStyle("-fx-background-color: white");

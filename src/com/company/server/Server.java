@@ -70,7 +70,8 @@ public class Server {
     }
 
     /**
-     * Callback lorsque la connexion se termine
+     * Callback lorsque la connexion se termine pour retirer
+     * la connexion de la liste principale de connexions
      * @param sc
      */
     synchronized public void onConnectionEnded(StationConnection sc){

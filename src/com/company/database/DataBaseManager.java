@@ -9,13 +9,15 @@ import java.sql.*;
 public abstract class DataBaseManager {
     // JDBC driver name and database URL
     protected final String DB_URL = "jdbc:mysql://localhost/meteo_radar";
-    //  Database credentials
+    /**  Database credentials
+     *  TODO: Mettre le compte utilisateur bdd souhaité
+     */
     private final String USER = "root";
     private final String PASS = "";
+
     protected Connection conn = null;
     
     public DataBaseManager() {
-
         //Connection à la BDD
         try {
             Class.forName("com.mysql.jdbc.Driver");

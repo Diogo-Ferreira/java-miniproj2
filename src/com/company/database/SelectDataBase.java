@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class SelectDataBase extends DataBaseManager {
 
     private HashMap<String,String> status = new HashMap<>();
-    private HashMap<Pair<Integer,Integer>,Double> data = new HashMap<>();
+    private HashMap<String,double[]> data = new HashMap<>();
 
 
     /**
@@ -63,7 +63,10 @@ public class SelectDataBase extends DataBaseManager {
      * @param name nom de la station
      */
     public void getDataFromStation(String qty,String name){
-        String query = "SELECT data.value,HOUR(data.timestamp) as hour,DATEDIFF(NOW(),data.timestamp) as day FROM" +
+        /*String query = "SELECT data.value,HOUR(data.timestamp) as hour,DATEDIFF(NOW(),data.timestamp) as day FROM" +
+                " data JOIN stations on data.stationId=stations.id WHERE qty=? AND stations.name=?";
+        */
+        String query = "SELECT data.value,data.min,data.max,data.timestamp FROM" +
                 " data JOIN stations on data.stationId=stations.id WHERE qty=? AND stations.name=?";
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -72,7 +75,13 @@ public class SelectDataBase extends DataBaseManager {
             ResultSet resultSet = preparedStatement.executeQuery();
             data.clear();
             while (resultSet.next()){
-                data.put(new Pair<>(resultSet.getInt("day"),resultSet.getInt("hour")),resultSet.getDouble("data.value"));
+                //Values
+                double tmp[] = {
+                        resultSet.getDouble("data.min"),
+                        resultSet.getDouble("data.value"),
+                        resultSet.getDouble("data.max")
+                };
+                data.put(resultSet.getString("data.timestamp"),tmp);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -103,7 +112,7 @@ public class SelectDataBase extends DataBaseManager {
         return status;
     }
 
-    public HashMap<Pair<Integer,Integer>, Double> getData() {
+    public HashMap<String, double[]> getData() {
         return data;
     }
 }

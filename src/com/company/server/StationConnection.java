@@ -61,11 +61,9 @@ public class StationConnection extends Thread {
         System.out.println("good bye");
         stop = true;
     }
-
     public IState getCurrentState() {
         return currentState;
     }
-
     public void setCurrentState(IState currentState) {
         this.currentState = currentState;
     }
@@ -75,23 +73,18 @@ public class StationConnection extends Thread {
     public void setLogged(boolean logged) {
         this.logged = logged;
     }
-
     public String getStationName() {
         return stationName;
     }
-
     public void setStationName(String stationName) {
         this.stationName = stationName;
     }
-
     public PrintWriter getWriter() {
         return writer;
     }
-
     public BufferedReader getReader() {
         return reader;
     }
-
     public InsertDataBase getDataBase() {
         return dataBase;
     }
